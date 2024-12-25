@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>E-Commerce Store</title>
+</head>
+
+<body>
+    <div class="products-heading">
+        <h1>Products</h1>
+    </div>
+
+    <div id="product-list">
+
+    </div>
+</body>
+<script>
+
+    const products = [
+        { id: 1, name: 'Product 1', price: 10.00 },
+        { id: 2, name: 'Product 2', price: 15.00 },
+        { id: 3, name: 'Product 3', price: 20.00 },
+        { id: 4, name: 'Product 4', price: 25.00 },
+        { id: 5, name: 'Product 5', price: 30.00 },
+        { id: 6, name: 'Product 6', price: 35.00 },
+        { id: 7, name: 'Product 7', price: 40.00 },
+        { id: 8, name: 'Product 8', price: 45.00 },
+        { id: 9, name: 'Product 9', price: 50.00 },
+        { id: 10, name: 'Product 10', price: 55.00 }
+    ];
+
+    const productContainer = document.getElementById('product-list');
+
+    function decreaseQuantity(button) {
+        const quantityInput = button.nextElementSibling;
+        if (quantityInput.value > 1) {
+            quantityInput.value = parseInt(quantityInput.value) - 1;
+        }
+    }
+
+    function increaseQuantity(button) {
+        const quantityInput = button.previousElementSibling;
+        quantityInput.value = parseInt(quantityInput.value) + 1;
+    }
+
+    products.forEach(product => {
+        const productDiv = document.createElement('div');
+        productDiv.classList.add('product');
+        productDiv.innerHTML = `
+            <h2>${product.name}</h2>
+            <p>Price: $${product.price.toFixed(2)}</p>
+            <form method="POST" action="{% url 'cart:add_to_cart' %}" class="add-to-cart-form">
+                <input type="hidden" name="user_id" value="2">
+                <input type="hidden" name="item_id" value="${product.id}">
+                <input type="hidden" name="price" value="${product.price.toFixed(2)}">
+                <div>
+                    <label for="quantity">Quantity:</label>
+                    <button type="button" onclick="decreaseQuantity(this)">-</button>
+                    <input type="number" name="quantity" min="1" value="1" required readonly>
+                    <button type="button" onclick="increaseQuantity(this)">+</button>
+                </div>
+                <button type="submit">Add to Cart</button>
+            </form>
+        `;
+        productContainer.appendChild(productDiv);
+    });
+
+    // Event listener for adding items to the cart
+    document.querySelectorAll('.add-to-cart-form').forEach(form => {
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+
+            // Use fetch to send the form data to the server
+            fetch("{% url 'cart:add_to_cart' %}", {
+                method: 'POST',
+                body: formData,
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle success (e.g., show a message, update the cart UI, etc.)
+                    console.log(data);
+                })
+                .catch(error => {
+                    // Handle error
+                    console.error('Error adding item to cart:', error);
+                });
+        });
+    });
+
+
+</script>
+
+</html>
+
+<style>
+    .product {
+        background: #e2eaf1;
+        display: inline-block;
+        margin: 15px;
+        padding: 50px;
+        border-radius: 10px;
+    }
+
+    #product-list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 0 15%;
+    }
+
+    button[type='submit'] {
+        border: 0 solid white;
+        border-radius: 20px;
+        padding: 10px;
+        background: #455b70;
+        color: white;
+        margin-top: 15px;
+    }
+
+
+    input[type="number"] {
+        width: 30px;
+        text-align: center;
+        padding: 0;
+        margin: 0;
+        display: inline-block;
+    }
+
+    h2 {
+        margin: 0;
+    }
+
+    .products-heading {
+        display: flex;
+        justify-content: center;
+    }
+</style>
