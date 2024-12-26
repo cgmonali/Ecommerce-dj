@@ -6,6 +6,11 @@
 </head>
 
 <body>
+    <div class="checkout-button">
+        <form method="POST" action="{% url 'cart:checkout' %}">
+            <button type="submit">Proceed to Checkout</button>
+        </form>
+    </div>
     <div class="products-heading">
         <h1>Products</h1>
     </div>
@@ -89,6 +94,22 @@
         });
     });
 
+    // Event listener for proceeding to checkout
+    document.querySelector('.checkout-button form').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        fetch("{% url 'cart:checkout' %}", {
+            method: 'POST',
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('Error proceeding to checkout:', error);
+            });
+    });
+
 
 </script>
 
@@ -135,5 +156,11 @@
     .products-heading {
         display: flex;
         justify-content: center;
+    }
+    button{
+        cursor: pointer;
+    }
+    .checkout-button form{
+        float: right;
     }
 </style>
